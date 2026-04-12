@@ -1,5 +1,10 @@
-.idea
+# comment ignore
+
+/.idea
+/.osp
+/.phpunit.cache
+/.phpunit.result.cache
 /vendor
-/assets/bootstrap
-/assets/fonts
+/storage
+/files
 composer.lock
