@@ -6,6 +6,6 @@ return function (Router $router) {
     $router->add(
         'GET',
         '/',
-        fn () => 'Index page',
+        fn () => view('home/index', ['number' => 24]),
     );
 };
