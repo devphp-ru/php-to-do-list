@@ -1,11 +1,12 @@
 <?php
 
 use Framework\Routing\Router;
+use App\Http\Controllers\IndexController;
 
 return function (Router $router) {
     $router->add(
         'GET',
         '/',
-        fn () => view('home/index', ['number' => 24]),
+        [IndexController::class, 'index'],
     );
 };
