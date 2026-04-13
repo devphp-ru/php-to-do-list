@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Framework\Routing;
 
 use Exception;
+use Framework\Http\HttpStatusCode;
+use Framework\Http\Request;
 use Throwable;
 
 class Router
 {
+
     protected array $routes = [];
     protected array $errorHandlers = [];
     protected Route $currentRoute;
@@ -34,23 +37,23 @@ class Router
 
     public function dispatchNotAllowed(): mixed
     {
-        $this->errorHandlers[400] ??= fn () => 'Not allowed 400';
+        $this->errorHandlers[HttpStatusCode::BAD_REQUEST] ??= fn () => 'Bad Request 400';
 
-        return $this->errorHandlers[400]();
+        return $this->errorHandlers[HttpStatusCode::BAD_REQUEST]();
     }
 
     public function dispatchNotFound(): mixed
     {
-        $this->errorHandlers[404] ??= fn () => 'Not found 404';
+        $this->errorHandlers[HttpStatusCode::NOT_FOUND] ??= fn () => 'Not Found 404';
 
-        return $this->errorHandlers[404]();
+        return $this->errorHandlers[HttpStatusCode::NOT_FOUND]();
     }
 
     public function dispatchError(?object $e = null): mixed
     {
-        $this->errorHandlers[500] ??= fn () => 'Internal Server Error ' . $e->getMessage();
+        $this->errorHandlers[HttpStatusCode::INTERNAL_SERVER_ERROR] ??= fn () => 'Internal Server Error 500' . $e->getMessage();
 
-        return $this->errorHandlers[500]();
+        return $this->errorHandlers[HttpStatusCode::INTERNAL_SERVER_ERROR]();
     }
 
     /**
@@ -82,9 +85,10 @@ class Router
 
     public function dispatch(): mixed
     {
+        $request = new Request();
         $paths = $this->paths();
-        $requestMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-        $requestPath = $_SERVER['REQUEST_URI'] ?? '/';
+        $requestMethod = $request->requestMethod('GET');
+        $requestPath = $request->requestUri('/');
         $matching = $this->match($requestMethod, $requestPath);
 
         if ($matching) {
@@ -97,7 +101,7 @@ class Router
         }
 
         if (in_array($requestPath, $paths)) {
-            return $this->dispatchError();
+            return $this->dispatchNotAllowed();
         }
 
         return $this->dispatchNotFound();
