@@ -28,6 +28,16 @@ class Route
 
     public function dispatch(): mixed
     {
+        if (is_array($this->handler)) {
+            [$class, $method] = $this->handler;
+
+            if (is_string($class)) {
+                return new $class()->{$method}();
+            }
+
+            return $class->{$method}();
+        }
+
         return call_user_func($this->handler);
     }
 
